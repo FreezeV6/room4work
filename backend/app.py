@@ -15,7 +15,11 @@ app = Flask(__name__)
 
 CORS(app, resources={
     r"/api/*": {
-        "origins": ["http://localhost:3000", "http://192.168.100.7:3000"],
+        "origins": [
+            "http://localhost:3000",
+            "http://192.168.100.7:3000",
+            "https://room4work.onrender.com"
+        ],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization", "Accept"],
         "supports_credentials": True,
