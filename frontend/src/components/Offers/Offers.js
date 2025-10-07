@@ -7,6 +7,9 @@ import '../../styles/Offers.css';
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
+console.log('🔧 REACT_APP_BACKEND_URL:', process.env.REACT_APP_BACKEND_URL);
+console.log('🔧 API_BASE_URL:', API_BASE_URL);
+
 const Offers = () => {
   const [offers, setOffers] = useState([]);
   const [filteredOffers, setFilteredOffers] = useState([]);
@@ -99,11 +102,11 @@ const Offers = () => {
     <div key={offer.id} className="offer-card">
       <div className="offer-image">
         <img
-          src={offer.image_url ? `${API_BASE_URL}${offer.image_url}` : noImage}
+          src={offer.image_url ? `${API_BASE_URL}${offer.image_url}` : noImageDataUrl}
           alt={offer.title}
           onError={(e) => {
-            if (e.target.src !== noImage) {
-              e.target.src = noImage;
+            if (e.target.src !== noImageDataUrl) {
+              e.target.src = noImageDataUrl;
             }
           }}
         />
