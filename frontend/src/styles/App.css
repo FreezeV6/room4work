@@ -1,0 +1,32 @@
+.App {
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.App-nav {
+  background-color: #282c34;
+  padding: 1rem;
+  display: none;
+  justify-content: center;
+  gap: 20px;
+}
+
+.App-nav a {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.App-nav a:hover {
+  background-color: #414856;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  background-color: #f8f9fa;
+}
