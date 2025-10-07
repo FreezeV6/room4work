@@ -5,7 +5,7 @@ import { useAuth } from '../../utils/AuthContext';
 import noImage from '../../assets/no-image.svg';
 import '../../styles/Offers.css';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://10.217.186.150:5000';
 
 const Offers = () => {
   const [offers, setOffers] = useState([]);
