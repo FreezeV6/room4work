@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaFilter, FaMapMarkerAlt, FaBuilding, FaMoneyBillWave, FaCalendarPlus, FaParking, FaUtensils } from 'react-icons/fa';
 import { useAuth } from '../../utils/AuthContext';
-import noImage from '../../assets/no-image.svg';
 import '../../styles/Offers.css';
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
