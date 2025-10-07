@@ -97,6 +97,8 @@ const Offers = () => {
     navigate(`/offers/${offerId}`);
   };
 
+  const noImageDataUrl = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns%3D"http://www.w3.org/2000/svg" viewBox%3D"0 0 400 300"%3E%3Crect width%3D"100%25" height%3D"100%25" fill%3D"%23f0f0f0"/%3E%3Ctext x%3D"50%25" y%3D"50%25" dominant-baseline%3D"middle" text-anchor%3D"middle" font-size%3D"24" fill%3D"%23999"%3ENo Image Available%3C/text%3E%3C/svg%3E';
+
   const renderOfferCard = (offer) => (
     <div key={offer.id} className="offer-card">
       <div className="offer-image">
