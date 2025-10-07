@@ -1,0 +1,9 @@
+.about-container {
+  text-align: center;
+  padding: 2rem;
+  background: #e0f7fa;
+}
+.about-container h1 {
+  color: #00838f;
+}
+

@@ -1,0 +1,376 @@
+.offers-container {
+  text-align: center;
+  padding: 2rem;
+  background: #eaf6ff;
+}
+
+.offers-container h1 {
+  color: #1e90ff;
+}
+.offers-container {
+  padding: 2rem;
+}
+
+.offers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 2rem 0;
+}
+
+.offer-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.offer-card:hover {
+  transform: translateY(-5px);
+}
+
+.offer-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.offer-card .offer-info {
+  padding: 1rem;
+}
+
+.offer-card h3 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.offer-card .price {
+  font-weight: bold;
+  color: #2d7ff9;
+  margin: 0.5rem 0;
+}
+
+.offer-card .location {
+  color: #666;
+  margin: 0.5rem 0;
+}
+
+.offer-card .area {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.offer-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.details-button,
+.booking-button {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.details-button {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.details-button:hover {
+  background-color: #e0e0e0;
+}
+
+.booking-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.booking-button:hover {
+  background-color: #0056b3;
+}
+
+.booking-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Styles for offer details view */
+.offer-details {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.back-button {
+  background: #f5f5f5;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.back-button:hover {
+  background: #e5e5e5;
+}
+
+.offer-details-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.offer-image img {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.offer-info .price {
+  font-size: 1.5rem;
+  color: #2d7ff9;
+  font-weight: bold;
+}
+
+.offer-info .address {
+  color: #666;
+  margin: 1rem 0;
+}
+
+.features {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.features span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f5f5f5;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9em;
+}
+
+.description {
+  line-height: 1.6;
+  color: #333;
+}
+
+.offers-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.toggle-filters-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #2d7ff9;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.toggle-filters-btn:hover {
+  background: #1e6fd8;
+}
+
+.filters-panel {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.filters-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  color: #333;
+}
+
+.clear-filters {
+  padding: 0.5rem 1rem;
+  background: #f5f5f5;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #666;
+  transition: background-color 0.2s;
+}
+
+.clear-filters:hover {
+  background: #e5e5e5;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-group label {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.filter-group input[type="text"],
+.filter-group input[type="number"] {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.range-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.filter-group.checkboxes {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+}
+
+.filter-group.checkboxes label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.office-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+
+.office-card:hover {
+  transform: translateY(-4px);
+}
+
+.office-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.office-info {
+  padding: 1.5rem;
+  position: relative;
+}
+
+.office-info h2 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.25rem;
+}
+
+.office-details {
+  margin-bottom: 1rem;
+}
+
+.office-details p {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+  color: #666;
+}
+
+.office-details p svg {
+  color: #007bff;
+}
+
+.office-details .price {
+  font-weight: 500;
+  color: #007bff;
+}
+
+.booking-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.booking-button:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.booking-button svg {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .offer-details-content {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-group.checkboxes {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
