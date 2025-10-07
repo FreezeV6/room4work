@@ -42,4 +42,5 @@
       "last 1 safari version"
     ]
   }
+  "proxy": "https://room4work-backend.onrender.com"
 }
