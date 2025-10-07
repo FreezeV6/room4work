@@ -5,7 +5,7 @@ import { useAuth } from '../../utils/AuthContext';
 import noImage from '../../assets/no-image.svg';
 import '../../styles/Offers.css';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'https://room4work-backend.onrender.com';
 
 const Offers = () => {
   const [offers, setOffers] = useState([]);
