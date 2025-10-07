@@ -4,7 +4,7 @@ import { FaUser, FaEnvelope, FaBuilding, FaCalendar, FaClock, FaMapMarkerAlt, Fa
 import { useAuth } from '../../utils/AuthContext';
 import '../../styles/UserProfile.css';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
 const UserProfile = () => {
   const { user, isAuthenticated } = useAuth();

@@ -6,7 +6,7 @@ import BookingForm from '../BookingForm/BookingForm';
 import noImage from '../../assets/no-image.svg';
 import '../../styles/OfferDetails.css';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
 const OfferDetails = () => {
   const [office, setOffice] = useState(null);
@@ -66,7 +66,9 @@ const OfferDetails = () => {
               alt={`${office.title} - zdjęcie ${index + 1}`}
               className={image.is_main ? 'main-image' : 'secondary-image'}
               onError={(e) => {
-                e.target.src = noImage;
+                if (e.target.src !== noImage) {
+                  e.target.src = noImage;
+                }
               }}
             />
           ))}
