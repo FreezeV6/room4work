@@ -10,7 +10,7 @@ import '../../styles/BookingForm.css';
 
 registerLocale('pl', pl);
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
 const BookingForm = ({ officeId, officeName, pricePerMonth }) => {
   const [startDate, setStartDate] = useState(new Date());
