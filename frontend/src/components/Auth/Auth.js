@@ -4,6 +4,11 @@ import { FaUser, FaEnvelope, FaLock, FaBuilding } from 'react-icons/fa';
 import { useAuth } from '../../utils/AuthContext';
 import '../../styles/Auth.css';
 
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+
+// Debug: sprawdź wartość zmiennej środowiskowej
+console.log('🔧 Auth API_BASE_URL:', API_BASE_URL);
+
 const Auth = () => {
   const { login } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
@@ -22,10 +27,9 @@ const Auth = () => {
     setError('');
 
     const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
-    const apiUrl = 'http://192.168.100.7:5000';
 
     try {
-      const response = await fetch(`${apiUrl}${endpoint}`, {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
