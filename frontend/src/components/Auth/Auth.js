@@ -26,7 +26,7 @@ const Auth = () => {
     e.preventDefault();
     setError('');
 
-    const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
+    const endpoint = isLogin ? '/api/auth/login/' : '/api/auth/register/';
 
     try {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
