@@ -30,6 +30,9 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
+# Disable automatic slash appending for REST API compatibility
+# This prevents 404 redirects on POST/PUT/DELETE requests without trailing slash
+APPEND_SLASH = False
 
 # Application definition
 
