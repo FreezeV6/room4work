@@ -28,7 +28,7 @@ const BookingForm = ({ officeId, officeName, pricePerMonth }) => {
       if (!officeId) return;
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/bookings/office/${officeId}`);
+        const response = await fetch(`${API_BASE_URL}/api/bookings/office/${officeId}/`);
         if (!response.ok) {
           throw new Error('Nie udało się pobrać rezerwacji');
         }
@@ -89,7 +89,7 @@ const BookingForm = ({ officeId, officeName, pricePerMonth }) => {
         throw new Error('Brak tokenu autoryzacji');
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/bookings`, {
+      const response = await fetch(`${API_BASE_URL}/api/bookings/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,15 +98,15 @@ const BookingForm = ({ officeId, officeName, pricePerMonth }) => {
         body: JSON.stringify({
           office_id: officeId,
           start_date: startDate.toISOString().split('T')[0],
-          end_date: endDate.toISOString().split('T')[0],
-          total_price: totalPrice
+          end_date: endDate.toISOString().split('T')[0]
         })
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Wystąpił błąd podczas rezerwacji');
+        const errorMsg = data.detail || data.message || data.non_field_errors?.[0] || 'Nie udało się utworzyć rezerwacji';
+        throw new Error(errorMsg);
       }
 
       setSuccess('Rezerwacja została utworzona pomyślnie!');

@@ -34,7 +34,7 @@ const Offers = () => {
     const fetchOffers = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_BASE_URL}/api/offices`);
+        const response = await fetch(`${API_BASE_URL}/api/offices/`);
         if (!response.ok) {
           throw new Error('Nie udało się pobrać ofert');
         }

@@ -30,9 +30,12 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
-# Disable automatic slash appending for REST API compatibility
-# This prevents 404 redirects on POST/PUT/DELETE requests without trailing slash
-APPEND_SLASH = False
+# Custom User Model - must be set early before any migrations
+AUTH_USER_MODEL = 'api.User'
+
+# Enable trailing slash handling for REST API
+APPEND_SLASH = True
+
 
 # Application definition
 
@@ -118,7 +121,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Warsaw'
 
 USE_I18N = True
 
@@ -161,5 +164,3 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=1),
     'SLIDING_TOKEN_LIFETIME_LATE_USER': timedelta(days=30),
 }
-
-AUTH_USER_MODEL = 'api.User'

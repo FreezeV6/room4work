@@ -51,10 +51,14 @@ class OfficeTypeViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 class CustomTokenObtainPairView(TokenObtainPairView):
+    permission_classes = [AllowAny]
+
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         if response.status_code == 200:
-            user = User.objects.get(email=request.data['email'])
-            response.data['user'] = UserSerializer(user).data
+            try:
+                user = User.objects.get(email=request.data.get('email'))
+                response.data['user'] = UserSerializer(user).data
+            except User.DoesNotExist:
+                pass
         return response
-

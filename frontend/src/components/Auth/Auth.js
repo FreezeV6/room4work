@@ -20,11 +20,13 @@ const Auth = () => {
     company_name: ''
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     const endpoint = isLogin ? '/api/auth/login/' : '/api/users/';
 
@@ -36,18 +38,28 @@ const Auth = () => {
           'Accept': 'application/json'
         },
         credentials: 'include',
-        body: JSON.stringify(formData)
+        body: JSON.stringify(isLogin
+          ? { email: formData.email, password: formData.password }
+          : formData)
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Wystąpił błąd');
+        const errorMsg = data.detail || data.message || data.email?.[0] || data.non_field_errors?.[0] || 'Wystąpił błąd';
+        throw new Error(errorMsg);
       }
 
-      // Użyj kontekstu do zalogowania
-      login(data.user, data.token);
-      navigate('/profile');
+      if (isLogin) {
+        // Login successful - use data.access as the token
+        login(data.user, data.access);
+        navigate('/profile');
+      } else {
+        // Registration successful
+        setSuccess('Konto zostało utworzone! Zaloguj się.');
+        setFormData({ email: '', password: '', first_name: '', last_name: '', company_name: '' });
+        setIsLogin(true);
+      }
     } catch (err) {
       setError(err.message);
     }
@@ -79,6 +91,7 @@ const Auth = () => {
         </div>
 
         {error && <div className="error-message">{error}</div>}
+        {success && <div className="success-message">{success}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
