@@ -1,138 +1,256 @@
-# Room4Work - Platforma Rezerwacji Przestrzeni Biurowych
+# 🏢 Room4Work - Platforma Rezerwacji Przestrzeni Biurowych
 
-## O Projekcie
+Nowoczesna aplikacja do rezerwacji biur, sal konferencyjnych i przestrzeni coworkingowych.
 
-Room4Work to nowoczesna platforma umożliwiająca rezerwację przestrzeni biurowych, coworkingowych oraz sal konferencyjnych. Projekt został stworzony z myślą o freelancerach, małych firmach oraz wszystkich, którzy potrzebują profesjonalnej przestrzeni do pracy.
+## 🎯 Główne Funkcje
 
-### Główne Funkcje
+- ✅ Przeglądanie dostępnych przestrzeni biurowych
+- ✅ Zaawansowane filtrowanie (lokalizacja, cena, powierzchnia, udogodnienia)
+- ✅ System rezerwacji online
+- ✅ Panel użytkownika z historią rezerwacji
+- ✅ Zarządzanie rezerwacjami (tworzenie, anulowanie)
+- ✅ Szczegółowe opisy i galerie zdjęć
 
-- Przeglądanie dostępnych przestrzeni biurowych
-- Zaawansowane filtrowanie ofert (lokalizacja, cena, powierzchnia, udogodnienia)
-- System rezerwacji online
-- Panel użytkownika z historią rezerwacji
-- Zarządzanie rezerwacjami (tworzenie, anulowanie)
-- Szczegółowe opisy i galerie zdjęć biur
-
-## Technologie
+## 🛠️ Technologia
 
 ### Frontend
-- React.js
-- React Router
-- Context API do zarządzania stanem
-- CSS Modules
-- React Icons
+- **React.js** - UI framework
+- **React Router** - Routing
+- **Context API** - State management
+- **CSS** - Stylizacja
+- **React Icons** - Ikony
 
 ### Backend
-- Python
-- Flask
-- PostgreSQL
-- JWT do autoryzacji
-- BCrypt do hashowania haseł
+- **Django** - Web framework
+- **Django REST Framework** - REST API
+- **PostgreSQL** - Baza danych
+- **JWT** - Autentykacja
+- **Python 3.11+** - Runtime
 
-## Wymagania Systemowe
+## 📋 Wymagania
 
-### Frontend
-- Node.js (v14 lub nowszy)
-- npm lub yarn
+- Python 3.11+
+- Node.js 16+
+- PostgreSQL 12+
+- npm/yarn
 
-### Backend
-- Python 3.8 lub nowszy
-- PostgreSQL 12 lub nowszy
+## ⚡ Quick Start
 
-## Instalacja i Uruchomienie
+### Backend (Django)
 
-### Backend
-
-1. Przejdź do katalogu backend:
 ```bash
 cd backend
-```
 
-2. Utwórz i aktywuj wirtualne środowisko:
-```bash
-python -m venv venv
-source venv/bin/activate  # dla Linux/MacOS
-venv\Scripts\activate     # dla Windows
-```
+# Wirtualne środowisko
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# lub
+.venv\Scripts\activate     # Windows
 
-3. Zainstaluj zależności:
-```bash
+# Zależności
 pip install -r requirements.txt
+
+# Konfiguracja (skopiuj .env.example na .env i uzupełnij)
+cp .env.example .env
+
+# Migracje bazy
+python manage.py migrate
+
+# Superuser (admin)
+python manage.py createsuperuser
+
+# Start serwera
+python manage.py runserver
 ```
 
-4. Skonfiguruj zmienne środowiskowe w pliku .env:
-```env
-POSTGRES_DB=####
-POSTGRES_USER=####
-POSTGRES_PASSWORD=####
-POSTGRES_HOST=####
-POSTGRES_PORT=####
-APP_SECRET_KEY=####
-```
+Backend dostępny: `http://localhost:8000`
 
-5. Uruchom serwer:
-```bash
-python app.py
-```
+### Frontend (React)
 
-### Frontend
-
-1. Przejdź do katalogu frontend:
 ```bash
 cd frontend
-```
 
-2. Zainstaluj zależności:
-```bash
+# Zależności
 npm install
-```
 
-3. Uruchom aplikację:
-```bash
+# Konfiguracja (skopiuj .env.example na .env)
+cp .env.example .env
+
+# Development server
 npm start
 ```
 
-## Dostęp do Aplikacji
+Frontend dostępny: `http://localhost:3000`
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5000
+## 📚 Dokumentacja
 
-## Uwierzytelnianie
+- **[SETUP.md](./SETUP.md)** - Pełne instrukcje instalacji i konfiguracji
+- **[IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)** - Podsumowanie zmian
 
-Aplikacja wykorzystuje JWT (JSON Web Tokens) do uwierzytelniania. Token jest przechowywany w localStorage i automatycznie dołączany do nagłówków żądań HTTP.
+## 🔌 API Endpoints
 
-## Struktura Projektu
+### Auth
+- `POST /api/auth/login/` - Login
+- `POST /api/auth/refresh/` - Refresh token
+
+### Users
+- `POST /api/users/` - Register
+- `GET /api/users/{id}/` - Get user
+- `PUT /api/users/{id}/` - Update user
+
+### Offices
+- `GET /api/offices/` - List offices
+- `GET /api/offices/{id}/` - Get office
+- `POST /api/offices/` - Create office
+- `PUT /api/offices/{id}/` - Update office
+- `DELETE /api/offices/{id}/` - Delete office
+
+### Bookings
+- `GET /api/bookings/` - My bookings
+- `POST /api/bookings/` - Create booking
+- `DELETE /api/bookings/{id}/` - Cancel booking
+
+### Reviews
+- `GET /api/reviews/?office_id={id}` - Get reviews
+- `POST /api/reviews/` - Create review
+
+## 📁 Struktura Projektu
 
 ```
 room4work/
 ├── backend/
-│   ├── app.py              # Główny plik aplikacji Flask
-│   ├── init_db.py          # Skrypt inicjalizacji bazy danych
-│   ├── requirements.txt     # Zależności Pythona
-│   ├── schema.sql          # Schema bazy danych
-│   └── uploads/            # Katalog na przesyłane pliki
+│   ├── api/
+│   │   ├── models.py        # Django models
+│   │   ├── views.py         # ViewSets
+│   │   ├── serializers.py   # Serializers
+│   │   ├── urls.py          # API routes
+│   │   └── migrations/       # DB migrations
+│   ├── src/
+│   │   ├── settings.py      # Django settings
+│   │   ├── urls.py          # Main routes
+│   │   ├── wsgi.py          # WSGI config
+│   │   └── asgi.py          # ASGI config
+│   ├── manage.py
+│   ├── requirements.txt
+│   └── .env.example
 │
-└── frontend/
-    ├── public/             # Pliki statyczne
-    └── src/
-        ├── components/     # Komponenty React
-        ├── styles/        # Pliki CSS
-        ├── utils/         # Narzędzia i helpers
-        └── assets/        # Zasoby (obrazy, ikony)
+├── frontend/
+│   ├── src/
+│   │   ├── components/      # React components
+│   │   ├── styles/          # CSS files
+│   │   ├── utils/           # Helpers (auth, etc)
+│   │   ├── assets/          # Images, logos
+│   │   └── App.js
+│   ├── public/
+│   ├── package.json
+│   └── .env.example
+│
+├── SETUP.md                 # Setup guide
+└── IMPLEMENTATION_SUMMARY.md # Changes summary
 ```
 
-# TODO
-### Faza 1
-- [ ] Dodanie funkcji recenzji i ocen dla przestrzeni biurowych
-- [ ] Implementacja powiadomień e-mail dla rezerwacji i anulacji
-- [ ] Naprawa wyświetlania zdjęć
-- [ ] Optymalizacja zapytań do bazy danych
-- [ ] Naprawa wyświetlania lokalizacji w offers
-- [ ] Dodanie mapy do OfferDetails
-- [ ] Implementacja CRM
-- [ ] Naprawa styli filtrowania
-- [ ] Lepszy UX/UI
-- [ ] About page
-- [ ] Contact page
-### Faza 2
-- [ ] Dodanie AI do sugestii przestrzeni biurowych na podstawie preferencji użytkownika
+## 🚀 Deployment
+
+### Render
+
+**Backend:**
+1. Push to GitHub
+2. Create Web Service on Render
+3. Set environment variables (POSTGRES_*, SECRET_KEY)
+4. Build: `bash build.sh`
+5. Start: `gunicorn src.wsgi:application`
+
+**Frontend:**
+1. Push to GitHub
+2. Create Static Site on Render
+3. Build: `npm install && npm run build`
+4. Publish: `build/`
+
+## 🔐 Autentykacja
+
+- JWT tokens przechowywane w `localStorage`
+- Token wysyłany w nagłówku: `Authorization: Bearer {token}`
+- Tokens:
+  - `access` - Short-lived (60 min)
+  - `refresh` - Long-lived (1 day)
+
+## 🐛 Troubleshooting
+
+### "Connection refused" na DB
+```bash
+# Sprawdź PostgreSQL
+psql -U postgres
+```
+
+### "Invalid token" error
+```javascript
+// Sprawdź localStorage
+console.log(localStorage.getItem('token'))
+```
+
+### CORS errors
+- Sprawdź `CORS_ALLOWED_ORIGINS` w `settings.py`
+- Frontend URL musi być dodany
+
+### 404 na API
+- Sprawdź trailing slashe: `/api/offices/` nie `/api/offices`
+
+## 📝 Development Tips
+
+### Django Shell
+```bash
+python manage.py shell
+```
+
+### Create superuser
+```bash
+python manage.py createsuperuser
+```
+
+### Run migrations
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+## 🎓 Zmiany w kodzie (v2.0)
+
+- ✅ DateField zamiast DateTimeField dla rezerwacji
+- ✅ Auto-generation username z email
+- ✅ Ulepszone error handling
+- ✅ JWT token obsługa (`data.access`)
+- ✅ CORS prawidłowo skonfigurowany
+- ✅ Trailing slashe na wszystkich endpoints
+
+Szczegóły: [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)
+
+## 📋 TODO
+
+- [ ] Email notifications (booking, cancellation)
+- [ ] Reviews and ratings
+- [ ] Map integration (Google Maps)
+- [ ] Advanced search filters
+- [ ] User dashboard
+- [ ] Admin panel improvements
+- [ ] Payment integration
+- [ ] Calendar view for bookings
+- [ ] Multi-language support
+
+## 👤 Author
+
+GitHub Copilot - Code Implementation
+
+## 📄 License
+
+MIT License
+
+## 📞 Support
+
+1. Sprawdź [SETUP.md](./SETUP.md) dla instalacji
+2. Sprawdź [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) dla zmian
+3. Sprawdź logs w terminalu/console
+
+---
+
+**Status: ✅ Gotowy do wdrożenia | Ready for deployment**
+

@@ -39,11 +39,15 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return self.queryset.filter(office_id=self.kwargs['office_pk'])
+        # Allow filtering by office_id via query parameter
+        queryset = self.queryset.all()
+        office_id = self.request.query_params.get('office_id')
+        if office_id:
+            queryset = queryset.filter(office_id=office_id)
+        return queryset
 
     def perform_create(self, serializer):
-        office = Office.objects.get(pk=self.kwargs['office_pk'])
-        serializer.save(user=self.request.user, office=office)
+        serializer.save(user=self.request.user)
 
 class OfficeTypeViewSet(viewsets.ModelViewSet):
     queryset = OfficeType.objects.all()
@@ -51,10 +55,14 @@ class OfficeTypeViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 class CustomTokenObtainPairView(TokenObtainPairView):
+    permission_classes = [AllowAny]
+
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         if response.status_code == 200:
-            user = User.objects.get(email=request.data['email'])
-            response.data['user'] = UserSerializer(user).data
+            try:
+                user = User.objects.get(email=request.data.get('email'))
+                response.data['user'] = UserSerializer(user).data
+            except User.DoesNotExist:
+                pass
         return response
-

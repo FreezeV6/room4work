@@ -21,7 +21,7 @@ const OfferDetails = () => {
     const fetchOfficeDetails = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_BASE_URL}/api/offices/${id}`);
+        const response = await fetch(`${API_BASE_URL}/api/offices/${id}/`);
         if (!response.ok) {
           throw new Error('Nie udało się pobrać szczegółów oferty');
         }

@@ -22,7 +22,7 @@ const UserProfile = () => {
     }
 
     const token = localStorage.getItem('token');
-    fetch(`${API_BASE_URL}/api/user/bookings`, {
+    fetch(`${API_BASE_URL}/api/bookings/`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Accept': 'application/json'
@@ -44,7 +44,7 @@ const UserProfile = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/api/bookings/${bookingId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/bookings/${bookingId}/`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -54,7 +54,14 @@ const UserProfile = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Nie udało się anulować rezerwacji');
+        let errorMsg = 'Nie udało się anulować rezerwacji';
+        try {
+          const data = await response.json();
+          errorMsg = data.detail || data.message || errorMsg;
+        } catch (e) {
+          // Response might not be JSON
+        }
+        throw new Error(errorMsg);
       }
 
       // Aktualizuj stan po udanym anulowaniu
