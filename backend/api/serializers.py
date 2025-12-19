@@ -58,10 +58,6 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = ['id', 'user', 'office', 'office_id', 'start_date', 'end_date', 'total_price', 'status']
 
-    def create(self, validated_data):
-        office_id = validated_data.pop('office_id')
-        booking = Booking.objects.create(office_id=office_id, **validated_data)
-        return booking
 
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
