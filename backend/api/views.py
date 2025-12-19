@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import User, Office, Booking, Review, OfficeType
 from .serializers import UserSerializer, OfficeSerializer, BookingSerializer, ReviewSerializer, OfficeTypeSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from decimal import Decimal
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -31,7 +32,21 @@ class BookingViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        office = serializer.validated_data['office']
+        start_date = serializer.validated_data['start_date']
+        end_date = serializer.validated_data['end_date']
+
+        # Calculate number of days
+        days = (end_date - start_date).days
+        if days < 1:
+            days = 1
+
+        # Calculate total price
+        # Assuming price is per month, calculate daily rate
+        daily_price = office.price / Decimal(30)
+        total_price = daily_price * Decimal(days)
+
+        serializer.save(user=self.request.user, total_price=total_price)
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
