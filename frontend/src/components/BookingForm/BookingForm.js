@@ -46,9 +46,10 @@ const BookingForm = ({ officeId, officeName, pricePerMonth }) => {
   useEffect(() => {
     // Obliczanie ceny
     if (startDate && endDate && pricePerMonth) {
-      const days = differenceInDays(endDate, startDate) + 1;
-      const pricePerDay = (pricePerMonth * 12) / 365; // Dzienna stawka
-      const calculatedPrice = Math.round(pricePerDay * days);
+      const days = differenceInDays(endDate, startDate);
+      const actualDays = days < 1 ? 1 : days;
+      const pricePerDay = pricePerMonth / 30; // Dzienna stawka
+      const calculatedPrice = Math.round(pricePerDay * actualDays);
       setTotalPrice(calculatedPrice);
     }
   }, [startDate, endDate, pricePerMonth]);
@@ -139,8 +140,8 @@ const BookingForm = ({ officeId, officeName, pricePerMonth }) => {
         <h4>Podsumowanie rezerwacji:</h4>
         {startDate && endDate && (
           <>
-            <p>Okres rezerwacji: {differenceInDays(endDate, startDate) + 1} dni</p>
-            <p className="total-price">Całkowita cena: {totalPrice} PLN</p>
+            <p>Okres rezerwacji: {differenceInDays(endDate, startDate) < 1 ? 1 : differenceInDays(endDate, startDate)} dni</p>
+            <p className="total-price">Szacowana cena: {totalPrice} PLN</p>
           </>
         )}
       </div>

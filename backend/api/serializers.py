@@ -49,7 +49,10 @@ class OfficeSerializer(serializers.ModelSerializer):
 class BookingSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     office = OfficeSerializer(read_only=True)
-    office_id = serializers.IntegerField(write_only=True)
+    office_id = serializers.PrimaryKeyRelatedField(
+        queryset=Office.objects.all(), source='office', write_only=True
+    )
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = Booking
