@@ -39,6 +39,7 @@ const Offers = () => {
           throw new Error('Nie udało się pobrać ofert');
         }
         const data = await response.json();
+        console.log('📦 Fetched offers:', data);
         setOffers(data);
         setFilteredOffers(data);
       } catch (err) {
@@ -99,7 +100,9 @@ const Offers = () => {
 
   const noImageDataUrl = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns%3D"http://www.w3.org/2000/svg" viewBox%3D"0 0 400 300"%3E%3Crect width%3D"100%25" height%3D"100%25" fill%3D"%23f0f0f0"/%3E%3Ctext x%3D"50%25" y%3D"50%25" dominant-baseline%3D"middle" text-anchor%3D"middle" font-size%3D"24" fill%3D"%23999"%3ENo Image Available%3C/text%3E%3C/svg%3E';
 
-  const renderOfferCard = (offer) => (
+  const renderOfferCard = (offer) => {
+    console.log('🔍 Offer data:', offer);
+    return (
     <div key={offer.id} className="offer-card">
       <div className="offer-image">
         <img
@@ -115,13 +118,13 @@ const Offers = () => {
       <div className="offer-content">
         <h3>{offer.name}</h3>
         <p className="offer-location">
-          <FaMapMarkerAlt /> {offer.location || 'Lokalizacja niedostępna'}
+          <FaMapMarkerAlt /> {offer.address || 'Lokalizacja niedostępna'}
         </p>
         <p className="offer-area">
-          <FaBuilding /> {offer.area_sqm} m²
+          <FaBuilding /> {offer.office_type?.name || 'Biuro'}
         </p>
         <p className="offer-price">
-          <FaMoneyBillWave /> {offer.price_per_month} PLN/miesiąc
+          <FaMoneyBillWave /> {offer.price} PLN/miesiąc
         </p>
         <div className="offer-features">
           {offer.has_parking && (
@@ -146,6 +149,7 @@ const Offers = () => {
       </div>
     </div>
   );
+  };
 
   if (loading) return <div className="loading">Ładowanie...</div>;
   if (error) return <div className="error-message">{error}</div>;
