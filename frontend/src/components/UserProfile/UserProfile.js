@@ -101,7 +101,7 @@ const UserProfile = () => {
       {bookingsToShow.map(booking => (
         <div key={booking.id} className={`booking-card ${booking.status}`}>
           <div className="booking-header">
-            <h3>{booking.title}</h3>
+            <h3>{booking.office?.name || 'Biuro'}</h3>
             <span className={`status-badge ${booking.status}`}>
               {booking.status === 'pending' ? 'Oczekująca' :
                booking.status === 'confirmed' ? 'Potwierdzona' :
@@ -111,15 +111,15 @@ const UserProfile = () => {
           <div className="booking-details">
             <p>
               <FaMapMarkerAlt className="icon" />
-              <span>{booking.address}, {booking.city}</span>
+              <span>{booking.office?.address || 'Lokalizacja niedostępna'}</span>
             </p>
             <p>
               <FaCalendar className="icon" />
-              <span>Od: {new Date(booking.start_date).toLocaleDateString()}</span>
+              <span>Od: {new Date(booking.start_date).toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.')}</span>
             </p>
             <p>
               <FaClock className="icon" />
-              <span>Do: {new Date(booking.end_date).toLocaleDateString()}</span>
+              <span>Do: {new Date(booking.end_date).toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '.')}</span>
             </p>
             <p>
               <FaMoneyBillWave className="icon" />

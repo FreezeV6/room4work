@@ -99,13 +99,13 @@ const OfferDetails = () => {
 
       <div className="offer-details">
         <div className="offer-header">
-          <h1>{office.title}</h1>
+          <h1>{office.name}</h1>
           <div className="offer-main-info">
             <p className="price">
-              <FaMoneyBillWave /> {office.price_per_month} PLN/miesiąc
+              <FaMoneyBillWave /> {office.price} PLN/miesiąc
             </p>
             <p className="location">
-              <FaMapMarkerAlt /> {office.address}, {office.city}
+              <FaMapMarkerAlt /> {office.address}
             </p>
           </div>
         </div>
@@ -118,26 +118,16 @@ const OfferDetails = () => {
             <div className="features-grid">
               <div className="feature">
                 <FaMapMarkerAlt />
-                <span>Lokalizacja: {office.address}, {office.city}</span>
+                <span>Lokalizacja: {office.address}</span>
               </div>
               <div className="feature">
                 <FaBuilding />
-                <span>Powierzchnia: {office.area_sqm} m²</span>
+                <span>Typ: {office.office_type?.name || 'Biuro'}</span>
               </div>
-              <div className="feature">
-                <FaUsers />
-                <span>Max. liczba osób: {office.max_people}</span>
-              </div>
-              {office.has_parking && (
+              {office.owner && (
                 <div className="feature">
-                  <FaParking />
-                  <span>Parking dostępny</span>
-                </div>
-              )}
-              {office.has_kitchen && (
-                <div className="feature">
-                  <FaUtensils />
-                  <span>Dostęp do kuchni</span>
+                  <FaUsers />
+                  <span>Właściciel: {office.owner.username}</span>
                 </div>
               )}
             </div>
@@ -178,7 +168,7 @@ const OfferDetails = () => {
           <BookingForm
             officeId={id}
             officeName={office.name}
-            pricePerMonth={office.price_per_month}
+            pricePerMonth={office.price}
           />
         </div>
       )}

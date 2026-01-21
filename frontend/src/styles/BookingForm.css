@@ -7,12 +7,89 @@
 }
 
 .booking-form-container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 2rem auto;
   padding: 2rem;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.booking-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.booking-layout .form-group {
+  flex: 1;
+}
+
+.booking-layout .booking-summary {
+  width: 300px;
+  flex-shrink: 0;
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  position: sticky;
+  top: 2rem;
+}
+
+.booking-summary h4 {
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #4CAF50;
+  color: #333;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.summary-row:last-of-type {
+  border-bottom: none;
+}
+
+.summary-row.total {
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid #e0e0e0;
+  border-bottom: none;
+  font-weight: 600;
+}
+
+.summary-label {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.summary-value {
+  color: #333;
+  font-weight: 500;
+}
+
+.summary-row.total .summary-value {
+  color: #4CAF50;
+  font-size: 1.1rem;
+}
+
+.booking-summary .submit-button {
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .booking-layout {
+    flex-direction: column;
+  }
+  
+  .booking-layout .booking-summary {
+    width: 100%;
+    position: static;
+  }
 }
 
 .booking-form h3 {
@@ -228,6 +305,16 @@
 .date-picker-wrapper {
   flex: 1;
   min-width: 300px;
+}
+
+.date-picker-wrapper.single-calendar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.date-picker-wrapper.single-calendar .react-datepicker {
+  width: auto;
 }
 
 .date-picker-wrapper label {

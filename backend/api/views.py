@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -6,6 +6,7 @@ from .models import User, Office, Booking, Review, OfficeType
 from .serializers import UserSerializer, OfficeSerializer, BookingSerializer, ReviewSerializer, OfficeTypeSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from decimal import Decimal
+from django.db.models import Q
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -35,6 +36,20 @@ class BookingViewSet(viewsets.ModelViewSet):
         office = serializer.validated_data['office']
         start_date = serializer.validated_data['start_date']
         end_date = serializer.validated_data['end_date']
+
+        # Sprawdź czy daty nie kolidują z istniejącymi rezerwacjami
+        conflicting_bookings = Booking.objects.filter(
+            office=office,
+            status__in=['confirmed', 'pending']
+        ).filter(
+            Q(start_date__lte=end_date) & Q(end_date__gte=start_date)
+        )
+
+        if conflicting_bookings.exists():
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({
+                'non_field_errors': ['Wybrany termin koliduje z istniejącą rezerwacją. Proszę wybrać inny termin.']
+            })
 
         # Calculate number of days
         days = (end_date - start_date).days
