@@ -2,66 +2,53 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FaRobot, FaTimes, FaPaperPlane, FaSpinner } from 'react-icons/fa';
 import '../../styles/AiChat.css';
 
-// Konfiguracja Ollama - łatwo podłączysz pod Render
-const OLLAMA_CONFIG = {
-  // URL do Ollama na Render (zmień po deploymencie)
-  baseUrl: process.env.REACT_APP_OLLAMA_URL || 'http://localhost:11434',
-  // Model do użycia (np. llama2, mistral, codellama)
-  model: process.env.REACT_APP_OLLAMA_MODEL || 'llama2',
-  // Endpoint API
-  endpoint: '/api/generate',
-};
+// Hook do komunikacji z API Gemini (przez backend)
+const useGemini = () => {
+  const [isConnected, setIsConnected] = useState(true);
 
-// Hook do komunikacji z Ollama
-const useOllama = () => {
-  const [isConnected, setIsConnected] = useState(false);
-
-  // Sprawdź połączenie z Ollama
+  // Sprawdź połączenie z backendem
   const checkConnection = async () => {
     try {
-      const response = await fetch(`${OLLAMA_CONFIG.baseUrl}/api/tags`);
-      setIsConnected(response.ok);
-      return response.ok;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+      const response = await fetch(`${backendUrl}/api/chat/gemini/`);
+      const data = await response.json();
+      setIsConnected(data.status === 'online' && data.api_key_configured);
+      return data.api_key_configured;
     } catch (error) {
+      console.error('Connection check failed:', error);
       setIsConnected(false);
       return false;
     }
   };
 
-  // Wyślij wiadomość do Ollama
+  // Wyślij wiadomość do backendu
   const sendMessage = async (prompt, context = []) => {
     try {
-      const response = await fetch(`${OLLAMA_CONFIG.baseUrl}${OLLAMA_CONFIG.endpoint}`, {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
+
+      const response = await fetch(`${backendUrl}/api/chat/gemini/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: OLLAMA_CONFIG.model,
           prompt: prompt,
-          context: context,
-          stream: false,
-          // Opcje generowania
-          options: {
-            temperature: 0.7,
-            top_p: 0.9,
-            max_tokens: 500,
-          },
+          context: context.map(msg => `${msg.role}: ${msg.content}`).join('\n'),
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Błąd połączenia z Ollama');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP ${response.status}`);
       }
 
       const data = await response.json();
       return {
         success: true,
         response: data.response,
-        context: data.context,
       };
     } catch (error) {
-      console.error('Ollama error:', error);
+      console.error('Gemini error:', error);
       return {
         success: false,
         response: null,
@@ -70,63 +57,10 @@ const useOllama = () => {
     }
   };
 
-  // Streaming response (dla lepszego UX)
-  const sendMessageStream = async (prompt, onChunk, context = []) => {
-    try {
-      const response = await fetch(`${OLLAMA_CONFIG.baseUrl}${OLLAMA_CONFIG.endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: OLLAMA_CONFIG.model,
-          prompt: prompt,
-          context: context,
-          stream: true,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Błąd połączenia z Ollama');
-      }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let fullResponse = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n').filter(line => line.trim());
-
-        for (const line of lines) {
-          try {
-            const json = JSON.parse(line);
-            if (json.response) {
-              fullResponse += json.response;
-              onChunk(json.response);
-            }
-          } catch (e) {
-            // Ignoruj błędy parsowania
-          }
-        }
-      }
-
-      return { success: true, response: fullResponse };
-    } catch (error) {
-      console.error('Ollama stream error:', error);
-      return { success: false, error: error.message };
-    }
-  };
-
   return {
     isConnected,
     checkConnection,
     sendMessage,
-    sendMessageStream,
-    config: OLLAMA_CONFIG,
   };
 };
 
@@ -142,17 +76,17 @@ const AiChat = () => {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [ollamaStatus, setOllamaStatus] = useState('checking');
+  const [apiStatus, setApiStatus] = useState('checking');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  const ollama = useOllama();
+  const gemini = useGemini();
 
-  // Sprawdź status Ollama przy montowaniu
+  // Sprawdź status API przy montowaniu
   useEffect(() => {
     const checkStatus = async () => {
-      const connected = await ollama.checkConnection();
-      setOllamaStatus(connected ? 'connected' : 'disconnected');
+      const connected = await gemini.checkConnection();
+      setApiStatus(connected ? 'connected' : 'disconnected');
     };
     checkStatus();
   }, []);
@@ -347,34 +281,28 @@ const getSimulatedResponse = (userMessage) => {
       role: 'user',
       content: userMessage,
     };
-    setMessages(prev => [...prev, newUserMessage]);
+
+    const updatedMessages = [...messages, newUserMessage];
+    setMessages(updatedMessages);
     setIsLoading(true);
 
-    // Spróbuj wysłać do Ollama, jeśli podłączona
-    if (ollamaStatus === 'connected') {
-      const result = await ollama.sendMessage(userMessage);
+    // Przygotuj kontekst (ostatnie 10 wiadomości)
+    const contextMessages = updatedMessages.slice(-10);
 
-      if (result.success) {
-        setMessages(prev => [...prev, {
-          id: Date.now() + 1,
-          role: 'assistant',
-          content: result.response,
-        }]);
-      } else {
-        // Fallback do symulowanej odpowiedzi
-        setMessages(prev => [...prev, {
-          id: Date.now() + 1,
-          role: 'assistant',
-          content: getSimulatedResponse(userMessage),
-        }]);
-      }
-    } else {
-      // Symulowana odpowiedź gdy Ollama nie jest podłączona
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    const result = await gemini.sendMessage(userMessage, contextMessages);
+
+    if (result.success) {
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         role: 'assistant',
-        content: getSimulatedResponse(userMessage),
+        content: result.response,
+      }]);
+    } else {
+      // Pokaż błąd użytkownikowi
+      setMessages(prev => [...prev, {
+        id: Date.now() + 1,
+        role: 'assistant',
+        content: `Przepraszam, wystąpił problem z połączeniem. Spróbuj ponownie za chwilę. (${result.error})`,
       }]);
     }
 
@@ -408,9 +336,9 @@ const getSimulatedResponse = (userMessage) => {
             <FaRobot />
             <div>
               <h4>Asystent AI</h4>
-              <span className={`status ${ollamaStatus}`}>
-                {ollamaStatus === 'connected' ? 'Online' :
-                 ollamaStatus === 'checking' ? 'Sprawdzam...' : 'Demo mode'}
+              <span className={`status ${apiStatus}`}>
+                {apiStatus === 'connected' ? 'Online (Gemini)' :
+                 apiStatus === 'checking' ? 'Łączenie...' : 'Offline'}
               </span>
             </div>
           </div>
