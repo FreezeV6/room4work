@@ -61,12 +61,12 @@ class UserViewSet(viewsets.ModelViewSet):
         return super(UserViewSet, self).get_permissions()
 
 class OfficeViewSet(viewsets.ModelViewSet):
-    queryset = Office.objects.all()
+    queryset = Office.objects.select_related('owner', 'office_type').prefetch_related('images').all()
     serializer_class = OfficeSerializer
     permission_classes = [AllowAny]
 
 class BookingViewSet(viewsets.ModelViewSet):
-    queryset = Booking.objects.all()
+    queryset = Booking.objects.select_related('user', 'office', 'office__owner', 'office__office_type').prefetch_related('office__images').all()
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
 
