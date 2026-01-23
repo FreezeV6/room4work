@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   FaFilter,
@@ -16,13 +16,79 @@ import '../../styles/Offers.css';
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
+// Prosty komponent obrazka z natywnym lazy loading
+const OfferImage = memo(({ src, alt, fallback }) => {
+  const [imgSrc, setImgSrc] = useState(src);
+  const [isLoading, setIsLoading] = useState(true);
+
+  return (
+    <>
+      {isLoading && <div className="image-placeholder"><div className="image-placeholder-shimmer"></div></div>}
+      <img
+        src={imgSrc}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setIsLoading(false)}
+        onError={() => {
+          setImgSrc(fallback);
+          setIsLoading(false);
+        }}
+        style={{ opacity: isLoading ? 0 : 1 }}
+      />
+    </>
+  );
+});
+
+// Memoizowana karta oferty
+const OfferCard = memo(({ offer, onDetailsClick, getImageUrl, noImageDataUrl }) => (
+  <div
+    className="offer-card"
+    onClick={() => onDetailsClick(offer.id)}
+  >
+    <div className="offer-image">
+      <OfferImage
+        src={getImageUrl(offer)}
+        alt={offer.name}
+        fallback={noImageDataUrl}
+      />
+      {offer.is_available && <span className="availability-badge">Dostępne</span>}
+    </div>
+    <div className="offer-content">
+      <h3>{offer.name}</h3>
+      <p className="offer-location">
+        <FaMapMarkerAlt /> {offer.city || ''}{offer.address ? (offer.city ? `, ${offer.address}` : offer.address) : ''}
+      </p>
+      <div className="offer-details">
+        <span><FaBuilding /> {offer.area_sqm ? `${offer.area_sqm} m²` : '-'}</span>
+        <span><FaUsers /> {offer.max_people ? `do ${offer.max_people} osób` : '-'}</span>
+      </div>
+      <div className="offer-amenities">
+        {offer.has_parking && <span className="amenity"><FaParking /></span>}
+        {offer.has_kitchen && <span className="amenity"><FaUtensils /></span>}
+      </div>
+      <div className="offer-footer">
+        <div className="offer-price">
+          {offer.price ? parseFloat(offer.price).toLocaleString('pl-PL') : '0'} PLN
+          <span>/miesiąc</span>
+        </div>
+        <button className="details-button">
+          Szczegóły
+        </button>
+      </div>
+    </div>
+  </div>
+));
+
 const Offers = () => {
   const [offers, setOffers] = useState([]);
-  const [filteredOffers, setFilteredOffers] = useState([]);
+  const [displayedOffers, setDisplayedOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showFilters, setShowFilters] = useState(true);
   const [searchParams] = useSearchParams();
+  const [page, setPage] = useState(1);
+  const OFFERS_PER_PAGE = 12;
 
   const [filters, setFilters] = useState({
     city: searchParams.get('city') || '',
@@ -36,7 +102,18 @@ const Offers = () => {
     maxPeople: searchParams.get('maxPeople') || ''
   });
 
+  // Debounced filters for text inputs
+  const [debouncedFilters, setDebouncedFilters] = useState(filters);
+
   const navigate = useNavigate();
+
+  // Debounce effect for filters
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedFilters(filters);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [filters]);
 
   useEffect(() => {
     const fetchOffers = async () => {
@@ -49,7 +126,6 @@ const Offers = () => {
         }
         const data = await response.json();
         setOffers(data);
-        setFilteredOffers(data);
       } catch (err) {
         console.error('Błąd:', err);
         setError(err.message);
@@ -88,29 +164,58 @@ const Offers = () => {
     return value !== '';
   }).length;
 
-  useEffect(() => {
-    if (offers.length > 0) {
-      const filtered = offers.filter(offer => {
-        const price = parseFloat(offer.price) || 0;
-        const cityMatch = !filters.city ||
-          (offer.city && offer.city.toLowerCase().includes(filters.city.toLowerCase())) ||
-          (offer.address && offer.address.toLowerCase().includes(filters.city.toLowerCase()));
+  // Memoized filtered offers - obliczane tylko gdy offers lub debouncedFilters się zmienią
+  const filteredOffers = useMemo(() => {
+    if (offers.length === 0) return [];
 
-        return (
-          cityMatch &&
-          (!filters.minPrice || price >= parseFloat(filters.minPrice)) &&
-          (!filters.maxPrice || price <= parseFloat(filters.maxPrice)) &&
-          (!filters.minArea || (offer.area_sqm && offer.area_sqm >= parseFloat(filters.minArea))) &&
-          (!filters.maxArea || (offer.area_sqm && offer.area_sqm <= parseFloat(filters.maxArea))) &&
-          (!filters.hasParking || offer.has_parking) &&
-          (!filters.hasKitchen || offer.has_kitchen) &&
-          (!filters.minPeople || (offer.max_people && offer.max_people >= parseFloat(filters.minPeople))) &&
-          (!filters.maxPeople || (offer.max_people && offer.max_people <= parseFloat(filters.maxPeople)))
-        );
-      });
-      setFilteredOffers(filtered);
+    return offers.filter(offer => {
+      const price = parseFloat(offer.price) || 0;
+      const cityMatch = !debouncedFilters.city ||
+        (offer.city && offer.city.toLowerCase().includes(debouncedFilters.city.toLowerCase())) ||
+        (offer.address && offer.address.toLowerCase().includes(debouncedFilters.city.toLowerCase()));
+
+      return (
+        cityMatch &&
+        (!debouncedFilters.minPrice || price >= parseFloat(debouncedFilters.minPrice)) &&
+        (!debouncedFilters.maxPrice || price <= parseFloat(debouncedFilters.maxPrice)) &&
+        (!debouncedFilters.minArea || (offer.area_sqm && offer.area_sqm >= parseFloat(debouncedFilters.minArea))) &&
+        (!debouncedFilters.maxArea || (offer.area_sqm && offer.area_sqm <= parseFloat(debouncedFilters.maxArea))) &&
+        (!debouncedFilters.hasParking || offer.has_parking) &&
+        (!debouncedFilters.hasKitchen || offer.has_kitchen) &&
+        (!debouncedFilters.minPeople || (offer.max_people && offer.max_people >= parseFloat(debouncedFilters.minPeople))) &&
+        (!debouncedFilters.maxPeople || (offer.max_people && offer.max_people <= parseFloat(debouncedFilters.maxPeople)))
+      );
+    });
+  }, [offers, debouncedFilters]);
+
+  // Paginacja/infinite scroll
+  useEffect(() => {
+    const startIndex = 0;
+    const endIndex = page * OFFERS_PER_PAGE;
+    setDisplayedOffers(filteredOffers.slice(startIndex, endIndex));
+  }, [filteredOffers, page]);
+
+  // Load more przy scrollowaniu
+  const handleScroll = useCallback(() => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop >=
+      document.documentElement.offsetHeight - 500
+    ) {
+      if (displayedOffers.length < filteredOffers.length) {
+        setPage(prev => prev + 1);
+      }
     }
-  }, [offers, filters]);
+  }, [displayedOffers.length, filteredOffers.length]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedFilters]);
 
   const handleDetailsClick = (offerId) => {
     navigate(`/offers/${offerId}`);
@@ -298,50 +403,16 @@ const Offers = () => {
             </button>
           </div>
 
-          {filteredOffers.length > 0 ? (
+          {displayedOffers.length > 0 ? (
             <div className="offers-grid">
-              {filteredOffers.map(offer => (
-                <div
+              {displayedOffers.map(offer => (
+                <OfferCard
                   key={offer.id}
-                  className="offer-card"
-                  onClick={() => handleDetailsClick(offer.id)}
-                >
-                  <div className="offer-image">
-                    <img
-                      src={getImageUrl(offer)}
-                      alt={offer.name}
-                      onError={(e) => {
-                        if (e.target.src !== noImageDataUrl) {
-                          e.target.src = noImageDataUrl;
-                        }
-                      }}
-                    />
-                    {offer.is_available && <span className="availability-badge">Dostępne</span>}
-                  </div>
-                  <div className="offer-content">
-                    <h3>{offer.name}</h3>
-                    <p className="offer-location">
-                      <FaMapMarkerAlt /> {offer.city || ''}{offer.address ? (offer.city ? `, ${offer.address}` : offer.address) : ''}
-                    </p>
-                    <div className="offer-details">
-                      <span><FaBuilding /> {offer.area_sqm ? `${offer.area_sqm} m²` : '-'}</span>
-                      <span><FaUsers /> {offer.max_people ? `do ${offer.max_people} osób` : '-'}</span>
-                    </div>
-                    <div className="offer-amenities">
-                      {offer.has_parking && <span className="amenity"><FaParking /></span>}
-                      {offer.has_kitchen && <span className="amenity"><FaUtensils /></span>}
-                    </div>
-                    <div className="offer-footer">
-                      <div className="offer-price">
-                        {offer.price ? parseFloat(offer.price).toLocaleString('pl-PL') : '0'} PLN
-                        <span>/miesiąc</span>
-                      </div>
-                      <button className="details-button">
-                        Szczegóły
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                  offer={offer}
+                  onDetailsClick={handleDetailsClick}
+                  getImageUrl={getImageUrl}
+                  noImageDataUrl={noImageDataUrl}
+                />
               ))}
             </div>
           ) : (
