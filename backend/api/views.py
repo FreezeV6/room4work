@@ -7,6 +7,9 @@ from .serializers import UserSerializer, OfficeSerializer, BookingSerializer, Re
 from rest_framework_simplejwt.views import TokenObtainPairView
 from decimal import Decimal
 from django.db.models import Q
+from rest_framework.views import APIView
+from django.conf import settings
+import requests
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -122,3 +125,85 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
             {'message': 'Wiadomość została wysłana pomyślnie!'},
             status=status.HTTP_201_CREATED
         )
+
+class GeminiChatView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        """Endpoint testowy do sprawdzenia czy API działa"""
+        return Response({
+            'status': 'online', 
+            'message': 'Gemini Chat API is ready',
+            'api_key_configured': bool(settings.GEMINI_API_KEY)
+        })
+
+    def post(self, request):
+        print("GeminiChatView: Received request")
+        prompt = request.data.get('prompt')
+        context = request.data.get('context', '')
+
+        if not settings.GEMINI_API_KEY:
+            print("GeminiChatView: GEMINI_API_KEY is not set")
+            return Response({'error': 'Server configuration error: API Key missing'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if not prompt:
+            print("GeminiChatView: No prompt provided")
+            return Response({'error': 'No prompt provided'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            system_instruction = """
+            Jesteś asystentem AI dla Room4Work - serwisu wynajmu biur.
+            Twoim zadaniem jest pomoc użytkownikom w znalezieniu odpowiedniego biura do wynajęcia oraz udzielanie informacji na temat naszych usług.
+            Staraj się być pomocny, cierpliwy i profesjonalny.
+            Odpowiadaj po polsku, krótko i konkretnie.
+            """
+            full_prompt = f"{system_instruction}\n\nKontekst rozmowy: {context}\n\nUżytkownik: {prompt}"
+            
+            # Direct HTTP call to Gemini API
+            # Using gemini-2.5-flash - the latest stable model available
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+
+            headers = {
+                'Content-Type': 'application/json',
+                'x-goog-api-key': settings.GEMINI_API_KEY
+            }
+
+            payload = {
+                "contents": [
+                    {
+                        "parts": [
+                            {"text": full_prompt}
+                        ]
+                    }
+                ]
+            }
+
+            print("GeminiChatView: Sending request to Gemini API...")
+            response = requests.post(url, headers=headers, json=payload, timeout=30)
+
+            print(f"GeminiChatView: Response status: {response.status_code}")
+
+            if response.status_code != 200:
+                print(f"GeminiChatView: Error response: {response.text}")
+                return Response({'error': f'Gemini API error: {response.status_code}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            data = response.json()
+
+            # Extract text from response
+            try:
+                text_response = data['candidates'][0]['content']['parts'][0]['text']
+            except (KeyError, IndexError) as e:
+                print(f"GeminiChatView: Failed to parse response: {data}")
+                return Response({'error': 'Failed to parse Gemini response'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            print("GeminiChatView: Successfully received response from Gemini")
+            return Response({'response': text_response})
+
+        except requests.exceptions.Timeout:
+            print("GeminiChatView: Request timeout")
+            return Response({'error': 'Request timeout'}, status=status.HTTP_504_GATEWAY_TIMEOUT)
+        except Exception as e:
+            print(f"Gemini API Error: {e}")
+            import traceback
+            traceback.print_exc()
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
