@@ -9,6 +9,7 @@ import Auth from './components/Auth/Auth';
 import Contact from './components/Contact/Contact';
 import About from './components/About/About';
 import UserProfile from './components/UserProfile/UserProfile';
+import AiChat from './components/AiChat/AiChat';
 import './styles/App.css';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
               <Route path="/profile" element={<UserProfile />} />
             </Routes>
           </main>
+          <AiChat />
         </div>
       </Router>
     </AuthProvider>

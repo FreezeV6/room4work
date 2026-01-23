@@ -2,8 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import User, Office, Booking, Review, OfficeType
-from .serializers import UserSerializer, OfficeSerializer, BookingSerializer, ReviewSerializer, OfficeTypeSerializer
+from .models import User, Office, Booking, Review, OfficeType, ContactMessage
+from .serializers import UserSerializer, OfficeSerializer, BookingSerializer, ReviewSerializer, OfficeTypeSerializer, ContactMessageSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from decimal import Decimal
 from django.db.models import Q
@@ -102,3 +102,23 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             except User.DoesNotExist:
                 pass
         return response
+
+class ContactMessageViewSet(viewsets.ModelViewSet):
+    queryset = ContactMessage.objects.all()
+    serializer_class = ContactMessageSerializer
+
+    def get_permissions(self):
+        if self.action == 'create':
+            self.permission_classes = [AllowAny]
+        else:
+            self.permission_classes = [IsAuthenticated]
+        return super().get_permissions()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(
+            {'message': 'Wiadomość została wysłana pomyślnie!'},
+            status=status.HTTP_201_CREATED
+        )
