@@ -25,13 +25,20 @@ class Office(models.Model):
     office_type = models.ForeignKey(OfficeType, on_delete=models.SET_NULL, null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    area_sqm = models.IntegerField(null=True, blank=True)
+    max_people = models.IntegerField(null=True, blank=True)
+    has_parking = models.BooleanField(default=False)
+    has_kitchen = models.BooleanField(default=False)
+    has_conference_room = models.BooleanField(default=False)
+    is_available = models.BooleanField(default=True)
+    city = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
 class OfficeImage(models.Model):
     office = models.ForeignKey(Office, on_delete=models.CASCADE, related_name='images')
-    image_url = models.ImageField(upload_to='office_images/')
+    image_url = models.URLField(max_length=500)
 
     def __str__(self):
         return f"Image for {self.office.name}"
@@ -56,3 +63,18 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review for {self.office.name} by {self.user.username}"
+
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Wiadomość od {self.name} - {self.subject}"

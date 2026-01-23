@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Office, OfficeImage, OfficeType, Booking, Review
+from .models import User, Office, OfficeImage, OfficeType, Booking, Review, ContactMessage
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,7 +44,9 @@ class OfficeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Office
-        fields = ['id', 'name', 'address', 'description', 'price', 'owner', 'office_type', 'latitude', 'longitude', 'images']
+        fields = ['id', 'name', 'address', 'city', 'description', 'price', 'owner', 'office_type',
+                  'latitude', 'longitude', 'images', 'area_sqm', 'max_people',
+                  'has_parking', 'has_kitchen', 'has_conference_room', 'is_available']
 
 class BookingSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -75,3 +77,10 @@ class ReviewSerializer(serializers.ModelSerializer):
         office_id = validated_data.pop('office_id')
         review = Review.objects.create(office_id=office_id, **validated_data)
         return review
+
+
+class ContactMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactMessage
+        fields = ['id', 'name', 'email', 'subject', 'message', 'created_at', 'is_read']
+        read_only_fields = ['id', 'created_at']
